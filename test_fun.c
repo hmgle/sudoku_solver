@@ -50,13 +50,23 @@ int col4(int row)
 		+ row % 9;
 }
 
+int row4(int row)
+{
+	/* 
+	return (row % (9 * 9 * 3)) / (9 * 9) * 3
+		+ ((row % (9 * 9 * 3) % (9 * 9)) % (9 * 3)) / 9;
+	 */
+	return (row % (9 * 9 * 3)) / (9 * 9) * 3
+		+ (row % (9 * 3)) / 9;
+}
+
 int main(int argc, char **argv)
 {
 	int i;
 
 	for (i = 0; i < MAX_ROW; i++) {
-		printf("%d: %d\n", i, col4(i));
-		// printf("%d: %d\n", i, row3(i));
+		// printf("%d: %d\n", i, col4(i));
+		printf("%d: %d\n", i, row4(i));
 	}
 
 	return 0;
