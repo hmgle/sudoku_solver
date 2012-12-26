@@ -1,14 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "dancing_links.h"
+#include "debug_print.h"
 
 #define MAX_COLUMN	324	/* 81 cells + (9 + 9 + 9) * 9 */
 #define MAX_ROW		729	/* 81 cells * 9  */
-#define SUDOKU_MAXNUM	9
+#define SUDOKU_RANK	9
 
 struct dlx_header h;
 struct dlx_column col[MAX_COLUMN];
-struct dlx_node cell[MAX_COLUMN][SUDOKU_MAXNUM];
+struct dlx_node cell[MAX_COLUMN][SUDOKU_RANK];
 
 int select_col0_by_row(int row);
 int select_row0_by_row(int row);
@@ -21,57 +22,62 @@ int select_row3_by_row(int row);
 void init_sudoku(void);
 void release_sudoku(void);
 void show_usage(char *name);
-void parse_input(int init_data[][SUDOKU_MAXNUM], char *read_input, size_t size);
-void print_soduku(int init_data[][SUDOKU_MAXNUM]);
-void set_sudoku(int init_data[][SUDOKU_MAXNUM]);
+void parse_input(int init_data[][SUDOKU_RANK], char *read_input, size_t size);
+void print_soduku(int init_data[][SUDOKU_RANK]);
+void set_sudoku(int init_data[][SUDOKU_RANK]);
 void set_cell(int val, int row, int col);
+void cover_row(int row);
+void cover_col(int col);
+void del_col(struct dlx_column *col);
 
 int select_col0_by_row(int row)
 {
-	return row / SUDOKU_MAXNUM;
+	return row / SUDOKU_RANK;
 }
 
 int select_row0_by_row(int row)
 {
-	return row % SUDOKU_MAXNUM;
+	return row % SUDOKU_RANK;
 }
 
 int select_col1_by_row(int row)
 {
-	return row / (SUDOKU_MAXNUM * SUDOKU_MAXNUM) * SUDOKU_MAXNUM 
-		+ row % SUDOKU_MAXNUM;
+	return SUDOKU_RANK * SUDOKU_RANK 
+		+ row / (SUDOKU_RANK * SUDOKU_RANK) * SUDOKU_RANK 
+		+ row % SUDOKU_RANK;
 }
 
 int select_row1_by_row(int row)
 {
-	return row % (SUDOKU_MAXNUM * SUDOKU_MAXNUM) / SUDOKU_MAXNUM;
+	return row % (SUDOKU_RANK * SUDOKU_RANK) / SUDOKU_RANK;
 }
 
 int select_col2_by_row(int row)
 {
-	return row % (SUDOKU_MAXNUM * SUDOKU_MAXNUM);
+	return SUDOKU_RANK * SUDOKU_RANK * 2 
+		+ row % (SUDOKU_RANK * SUDOKU_RANK);
 }
 
 int select_row2_by_row(int row)
 {
-	return row / (SUDOKU_MAXNUM * SUDOKU_MAXNUM);
+	return row / (SUDOKU_RANK * SUDOKU_RANK);
 }
-
 
 int select_col3_by_row(int row)
 {
-	return (row / (SUDOKU_MAXNUM * SUDOKU_MAXNUM * 3)) * SUDOKU_MAXNUM * 3 
-		+ (row % (SUDOKU_MAXNUM * SUDOKU_MAXNUM * 3)) 
-		% (SUDOKU_MAXNUM * SUDOKU_MAXNUM) / (SUDOKU_MAXNUM * 3)
-		* SUDOKU_MAXNUM
-		+ row % SUDOKU_MAXNUM;
+	return SUDOKU_RANK * SUDOKU_RANK * 3 
+		+ (row / (SUDOKU_RANK * SUDOKU_RANK * 3)) * SUDOKU_RANK * 3 
+		+ (row % (SUDOKU_RANK * SUDOKU_RANK * 3)) 
+		% (SUDOKU_RANK * SUDOKU_RANK) / (SUDOKU_RANK * 3)
+		* SUDOKU_RANK
+		+ row % SUDOKU_RANK;
 }
 
 int select_row3_by_row(int row)
 {
-	return (row % (SUDOKU_MAXNUM * SUDOKU_MAXNUM * 3)) 
-		/ (SUDOKU_MAXNUM * SUDOKU_MAXNUM) * 3
-		+ (row % (SUDOKU_MAXNUM * 3)) / SUDOKU_MAXNUM;
+	return (row % (SUDOKU_RANK * SUDOKU_RANK * 3)) 
+		/ (SUDOKU_RANK * SUDOKU_RANK) * 3
+		+ (row % (SUDOKU_RANK * 3)) / SUDOKU_RANK;
 }
 
 void init_sudoku(void)
@@ -100,14 +106,14 @@ void init_sudoku(void)
 	 */
 	for (i = 0; i < MAX_COLUMN; i++) {
 		col[i].dx = &cell[i][0];
-		col[i].ux = &cell[i][SUDOKU_MAXNUM - 1];
+		col[i].ux = &cell[i][SUDOKU_RANK - 1];
 		cell[i][0].dx = &cell[i][1];
 		cell[i][0].ux = &col[i];
 		cell[i][0].cx = &col[i];
-		cell[i][SUDOKU_MAXNUM - 1].dx = &col[i];
-		cell[i][SUDOKU_MAXNUM - 1].ux = &cell[i][SUDOKU_MAXNUM - 2];
-		cell[i][SUDOKU_MAXNUM - 1].ux = &col[i];
-		for (j = 1; j < SUDOKU_MAXNUM - 1; j++) {
+		cell[i][SUDOKU_RANK - 1].dx = &col[i];
+		cell[i][SUDOKU_RANK - 1].ux = &cell[i][SUDOKU_RANK - 2];
+		cell[i][SUDOKU_RANK - 1].ux = &col[i];
+		for (j = 1; j < SUDOKU_RANK - 1; j++) {
 			cell[i][j].dx = &cell[i][j + 1];
 			cell[i][j].ux = &cell[i][j - 1];
 			cell[i][j].cx = &col[i];
@@ -153,7 +159,7 @@ void show_usage(char *name)
 	exit(1);
 }
 
-void parse_input(int init_data[][SUDOKU_MAXNUM], char *read_input, size_t size)
+void parse_input(int init_data[][SUDOKU_RANK], char *read_input, size_t size)
 {
 	int i;
 	int n = 0;
@@ -168,25 +174,25 @@ void parse_input(int init_data[][SUDOKU_MAXNUM], char *read_input, size_t size)
 				&& read_input[i] != 'X')
 			continue;
 
-		if (++n > SUDOKU_MAXNUM * SUDOKU_MAXNUM)
+		if (++n > SUDOKU_RANK * SUDOKU_RANK)
 			break;
 	}
 
 	return;
 }
 
-void print_soduku(int init_data[][SUDOKU_MAXNUM])
+void print_soduku(int init_data[][SUDOKU_RANK])
 {
 	int i, j;
 
-	for (i = 0; i < SUDOKU_MAXNUM; i++) {
+	for (i = 0; i < SUDOKU_RANK; i++) {
 		if (i % 3 == 0)
 			printf("+-------+-------+-------+\n");
-		for (j = 0; j < SUDOKU_MAXNUM; j++) {
+		for (j = 0; j < SUDOKU_RANK; j++) {
 			if (j % 3 == 0)
 				printf("| ");
 			printf("%d ", init_data[i][j]);
-			if (j == SUDOKU_MAXNUM - 1)
+			if (j == SUDOKU_RANK - 1)
 				printf("|");
 		}
 		printf("\n");
@@ -198,16 +204,81 @@ void set_cell(int val, int row, int col)
 {
 	if (val == 0)
 		return;
-	else {
-	}
+	else
+		cover_row(row * SUDOKU_RANK * SUDOKU_RANK 
+				+ col * SUDOKU_RANK + val - 1);
 }
 
-void set_sudoku(int init_data[][SUDOKU_MAXNUM])
+void cover_row(int row)
+{
+	struct dlx_node *tmp_cell;
+	struct dlx_column *tmp_column;
+
+	debug_print("row is %d", row);
+	tmp_cell = &cell[select_row0_by_row(row)][select_col0_by_row(row)];
+	tmp_column = (struct dlx_column *)&tmp_cell->cx;
+	del_col(tmp_column);
+	debug_print();
+
+	debug_print("row is %d", row);
+	debug_print("select_row1_by_row(row) = %d ", select_row1_by_row(row));
+	debug_print("select_col1_by_row(row) = %d ", select_col1_by_row(row));
+	tmp_cell = &cell[select_row1_by_row(row)][select_col1_by_row(row)];
+	debug_print();
+	tmp_column = (struct dlx_column *)&tmp_cell->cx;
+	debug_print();
+	del_col(tmp_column);
+	debug_print();
+
+	tmp_cell = &cell[select_row2_by_row(row)][select_col2_by_row(row)];
+	tmp_column = (struct dlx_column *)&tmp_cell->cx;
+	del_col(tmp_column);
+
+	tmp_cell = &cell[select_row3_by_row(row)][select_col3_by_row(row)];
+	tmp_column = (struct dlx_column *)&tmp_cell->cx;
+	del_col(tmp_column);
+
+	return;
+}
+
+void cover_col(int col)
+{
+	return;
+}
+
+void del_col(struct dlx_column *col)
+{
+#if 0
+	debug_print();
+	((struct dlx_column *)(col->lx))->rx = col->rx;
+	debug_print();
+	((struct dlx_column *)(col->rx))->lx = col->lx;
+	debug_print();
+	return;
+#else
+	struct dlx_column *tmp_col;
+
+	debug_print();
+	tmp_col = col->lx;
+	debug_print();
+	// tmp_col->rx = col->rx;
+	debug_print("%p", tmp_col->rx);
+	tmp_col->rx = NULL;
+	debug_print();
+
+	tmp_col = col->rx;
+	debug_print();
+	tmp_col->lx = col->lx;
+	debug_print();
+#endif
+}
+
+void set_sudoku(int init_data[][SUDOKU_RANK])
 {
 	int i, j;
 
-	for (i = 0; i < SUDOKU_MAXNUM; i++)
-		for (j = 0; j < SUDOKU_MAXNUM; j++)
+	for (i = 0; i < SUDOKU_RANK; i++)
+		for (j = 0; j < SUDOKU_RANK; j++)
 			set_cell(init_data[i][j], i, j);
 
 	return;
@@ -215,7 +286,7 @@ void set_sudoku(int init_data[][SUDOKU_MAXNUM])
 
 int main(int argc, char **argv)
 {
-	int init_data[SUDOKU_MAXNUM][SUDOKU_MAXNUM] = {{0}};
+	int init_data[SUDOKU_RANK][SUDOKU_RANK] = {{0}};
 	char read_input[256] = {0};
 	char *this_name = argv[0];
 	char *thisarg;

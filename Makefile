@@ -1,10 +1,11 @@
 CC = gcc
-CFLAGS = -Wall -O2
+CFLAGS = -Wall -O2 -g
 
 TARGET = demo dancing_links.o
 TMPTARGET = test_fun
 
 .PHONY: all clean
+
 all: $(TARGET) $(TMPTARGET)
 
 demo: demo.o dancing_links.o
