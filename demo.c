@@ -95,7 +95,7 @@ void init_sudoku(void)
 	col[MAX_COLUMN - 1].rx = &h;
 	col[MAX_COLUMN - 1].lx = &col[MAX_COLUMN - 2];
 	col[MAX_COLUMN - 1].cx = &col[MAX_COLUMN - 1];
-	for (i = 1; i < MAX_COLUMN - 2; i++) {
+	for (i = 1; i < MAX_COLUMN - 1; i++) {
 		col[i].rx = &col[i + 1];
 		col[i].lx = &col[i - 1];
 		col[i].cx = &col[i];
@@ -112,7 +112,7 @@ void init_sudoku(void)
 		cell[i][0].cx = &col[i];
 		cell[i][SUDOKU_RANK - 1].dx = &col[i];
 		cell[i][SUDOKU_RANK - 1].ux = &cell[i][SUDOKU_RANK - 2];
-		cell[i][SUDOKU_RANK - 1].ux = &col[i];
+		cell[i][SUDOKU_RANK - 1].cx = &col[i];
 		for (j = 1; j < SUDOKU_RANK - 1; j++) {
 			cell[i][j].dx = &cell[i][j + 1];
 			cell[i][j].ux = &cell[i][j - 1];
@@ -214,28 +214,22 @@ void cover_row(int row)
 	struct dlx_node *tmp_cell;
 	struct dlx_column *tmp_column;
 
-	debug_print("row is %d", row);
-	tmp_cell = &cell[select_row0_by_row(row)][select_col0_by_row(row)];
-	tmp_column = (struct dlx_column *)&tmp_cell->cx;
+	tmp_cell = &cell[select_col0_by_row(row)][select_row0_by_row(row)];
+	tmp_column = (struct dlx_column *)(tmp_cell->cx);
 	del_col(tmp_column);
-	debug_print();
 
-	debug_print("row is %d", row);
 	debug_print("select_row1_by_row(row) = %d ", select_row1_by_row(row));
 	debug_print("select_col1_by_row(row) = %d ", select_col1_by_row(row));
-	tmp_cell = &cell[select_row1_by_row(row)][select_col1_by_row(row)];
-	debug_print();
-	tmp_column = (struct dlx_column *)&tmp_cell->cx;
-	debug_print();
-	del_col(tmp_column);
-	debug_print();
-
-	tmp_cell = &cell[select_row2_by_row(row)][select_col2_by_row(row)];
-	tmp_column = (struct dlx_column *)&tmp_cell->cx;
+	tmp_cell = &cell[select_col1_by_row(row)][select_row1_by_row(row)];
+	tmp_column = (struct dlx_column *)(tmp_cell->cx);
 	del_col(tmp_column);
 
-	tmp_cell = &cell[select_row3_by_row(row)][select_col3_by_row(row)];
-	tmp_column = (struct dlx_column *)&tmp_cell->cx;
+	tmp_cell = &cell[select_col2_by_row(row)][select_row2_by_row(row)];
+	tmp_column = (struct dlx_column *)(tmp_cell->cx);
+	del_col(tmp_column);
+
+	tmp_cell = &cell[select_col3_by_row(row)][select_row3_by_row(row)];
+	tmp_column = (struct dlx_column *)(tmp_cell->cx);
 	del_col(tmp_column);
 
 	return;
@@ -248,29 +242,9 @@ void cover_col(int col)
 
 void del_col(struct dlx_column *col)
 {
-#if 0
-	debug_print();
 	((struct dlx_column *)(col->lx))->rx = col->rx;
-	debug_print();
 	((struct dlx_column *)(col->rx))->lx = col->lx;
-	debug_print();
 	return;
-#else
-	struct dlx_column *tmp_col;
-
-	debug_print();
-	tmp_col = col->lx;
-	debug_print();
-	// tmp_col->rx = col->rx;
-	debug_print("%p", tmp_col->rx);
-	tmp_col->rx = NULL;
-	debug_print();
-
-	tmp_col = col->rx;
-	debug_print();
-	tmp_col->lx = col->lx;
-	debug_print();
-#endif
 }
 
 void set_sudoku(int init_data[][SUDOKU_RANK])
