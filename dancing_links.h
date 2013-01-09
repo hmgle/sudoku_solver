@@ -25,6 +25,11 @@ struct dlx_column {
 struct dlx_header {
 	void *lx;
 	void *rx;
+	void *ux;
+	void *dx;
+	void *cx;
+	int s;		/* S[y] */
+	int id;
 };
 
 #endif

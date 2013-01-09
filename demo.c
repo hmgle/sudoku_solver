@@ -7,7 +7,9 @@
 #define MAX_ROW		729	/* 81 cells * 9  */
 #define SUDOKU_RANK	9
 
-struct dlx_header h;
+int count = 0;
+/* struct dlx_header h; */
+struct dlx_column h;
 struct dlx_column col[MAX_COLUMN];
 struct dlx_node cell[MAX_COLUMN][SUDOKU_RANK];
 
@@ -27,7 +29,8 @@ void print_soduku(int init_data[][SUDOKU_RANK]);
 void set_sudoku(int init_data[][SUDOKU_RANK]);
 void search(int n);
 void print_solution(void);
-struct dlx_column *choose_min_col(struct dlx_header *header);
+/* struct dlx_column *choose_min_col(struct dlx_header *header); */
+struct dlx_column *choose_min_col(struct dlx_column *header);
 void set_cell(int val, int row, int col);
 void solution_row(int row);
 void cover_col(struct dlx_column *col);
@@ -94,19 +97,23 @@ void init_sudoku(void)
 	 */
 	h.rx = &col[0];
 	h.lx = &col[MAX_COLUMN - 1];
+	h.id = 77777;
 	col[0].lx = &h;
 	col[0].rx = &col[1];
 	col[0].cx = &col[0];
 	col[0].s = SUDOKU_RANK;
+	col[0].id = 0;
 	col[MAX_COLUMN - 1].rx = &h;
 	col[MAX_COLUMN - 1].lx = &col[MAX_COLUMN - 2];
 	col[MAX_COLUMN - 1].cx = &col[MAX_COLUMN - 1];
 	col[MAX_COLUMN - 1].s = SUDOKU_RANK;
+	col[MAX_COLUMN - 1].id = MAX_COLUMN - 1;
 	for (i = 1; i < MAX_COLUMN - 1; i++) {
 		col[i].rx = &col[i + 1];
 		col[i].lx = &col[i - 1];
 		col[i].cx = &col[i];
 		col[i].s = SUDOKU_RANK;
+		col[i].id = i;
 	}
 
 	/*
@@ -224,20 +231,24 @@ void solution_row(int row)
 
 	tmp_cell = &cell[select_col0_by_row(row)][select_row0_by_row(row)];
 	tmp_column = (struct dlx_column *)(tmp_cell->cx);
+	debug_print();
 	cover_col(tmp_column);
 
 	debug_print("select_row1_by_row(row) = %d ", select_row1_by_row(row));
 	debug_print("select_col1_by_row(row) = %d ", select_col1_by_row(row));
 	tmp_cell = &cell[select_col1_by_row(row)][select_row1_by_row(row)];
 	tmp_column = (struct dlx_column *)(tmp_cell->cx);
+	debug_print();
 	cover_col(tmp_column);
 
 	tmp_cell = &cell[select_col2_by_row(row)][select_row2_by_row(row)];
 	tmp_column = (struct dlx_column *)(tmp_cell->cx);
+	debug_print();
 	cover_col(tmp_column);
 
 	tmp_cell = &cell[select_col3_by_row(row)][select_row3_by_row(row)];
 	tmp_column = (struct dlx_column *)(tmp_cell->cx);
+	debug_print();
 	cover_col(tmp_column);
 
 	return;
@@ -248,6 +259,10 @@ void cover_col(struct dlx_column *col)
 	struct dlx_node *row;
 	struct dlx_node *rightnode;
 
+	count++;
+	debug_print("id is %d", col->id);
+	debug_print("col->lx id is %d", ((struct dlx_column *)(col->lx))->id);
+	debug_print("col->lx id is %d", ((struct dlx_column *)(col->rx))->id);
 	((struct dlx_column *)(col->lx))->rx = col->rx;
 	((struct dlx_column *)(col->rx))->lx = col->lx;
 
@@ -291,10 +306,12 @@ void search(int n)
 	struct dlx_node *leftnode;
 
 	if (h.rx == &h) {
+		debug_print();
 		print_solution();
 		return;
 	} else {
 		min_col = choose_min_col(&h);
+		debug_print("min_col->id is %d", min_col->id);
 		cover_col(min_col);
 
 		for (row = min_col->dx; row != (void *)min_col; row = row->dx) {
@@ -302,13 +319,15 @@ void search(int n)
 
 			for (rightnode = row->rx; 
 				rightnode != row;
-				rightnode = rightnode->rx)
+				rightnode = rightnode->rx) {
+				debug_print();
 				cover_col(rightnode->cx);
+			}
 
 			search(n + 1);
 
 			remove_solutions(row);
-			min_col = row->cx;
+			// min_col = row->cx;
 
 			for (leftnode = row->lx;
 				leftnode != row;
@@ -325,7 +344,8 @@ void print_solution(void)
 	return;
 }
 
-struct dlx_column *choose_min_col(struct dlx_header *header)
+/* struct dlx_column *choose_min_col(struct dlx_header *header) */
+struct dlx_column *choose_min_col(struct dlx_column *header)
 {
 	struct dlx_column *min_col;
 	struct dlx_column *tmp_col;
@@ -349,6 +369,7 @@ void add_solutions(struct dlx_node *row)
 
 void remove_solutions(struct dlx_node *row)
 {
+	debug_print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
 	return;
 }
 
