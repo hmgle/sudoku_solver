@@ -7,7 +7,10 @@
 #define MAX_ROW		729	/* 81 cells * 9  */
 #define SUDOKU_RANK	9
 
-int count = 0;
+int FINISHED = 0;
+int RESULT_COUNT = 0;
+int RESULT[MAX_ROW] = {0};
+int init_data[SUDOKU_RANK][SUDOKU_RANK] = {{0}};
 /* struct dlx_header h; */
 struct dlx_column h;
 struct dlx_column col[MAX_COLUMN];
@@ -30,7 +33,7 @@ void set_sudoku(int init_data[][SUDOKU_RANK]);
 void search(int n);
 void print_solution(void);
 /* struct dlx_column *choose_min_col(struct dlx_header *header); */
-struct dlx_column *choose_min_col(struct dlx_column *header);
+struct dlx_column *choose_min_col(struct dlx_column *ptrheader);
 void set_cell(int val, int row, int col);
 void solution_row(int row);
 void cover_col(struct dlx_column *col);
@@ -158,6 +161,15 @@ void init_sudoku(void)
 			&cell[select_col0_by_row(i)][select_row0_by_row(i)];
 		cell[select_col3_by_row(i)][select_row3_by_row(i)].lx =
 			&cell[select_col2_by_row(i)][select_row2_by_row(i)];
+
+		cell[select_col0_by_row(i)][select_row0_by_row(i)].row_id =
+			i;
+		cell[select_col1_by_row(i)][select_row1_by_row(i)].row_id =
+			i;
+		cell[select_col2_by_row(i)][select_row2_by_row(i)].row_id =
+			i;
+		cell[select_col3_by_row(i)][select_row3_by_row(i)].row_id =
+			i;
 	}
 
 	return;
@@ -227,31 +239,22 @@ void set_cell(int val, int row, int col)
 void solution_row(int row)
 {
 	struct dlx_node *tmp_cell;
+	struct dlx_node *right_cell;
 	struct dlx_column *tmp_column;
 
+	debug_print("row is %d", row);
+	RESULT[RESULT_COUNT++] = row;
 	tmp_cell = &cell[select_col0_by_row(row)][select_row0_by_row(row)];
 	tmp_column = (struct dlx_column *)(tmp_cell->cx);
-	debug_print();
+	debug_print("col id is %d", tmp_column->id);
 	cover_col(tmp_column);
 
-	debug_print("select_row1_by_row(row) = %d ", select_row1_by_row(row));
-	debug_print("select_col1_by_row(row) = %d ", select_col1_by_row(row));
-	tmp_cell = &cell[select_col1_by_row(row)][select_row1_by_row(row)];
-	tmp_column = (struct dlx_column *)(tmp_cell->cx);
-	debug_print();
-	cover_col(tmp_column);
-
-	tmp_cell = &cell[select_col2_by_row(row)][select_row2_by_row(row)];
-	tmp_column = (struct dlx_column *)(tmp_cell->cx);
-	debug_print();
-	cover_col(tmp_column);
-
-	tmp_cell = &cell[select_col3_by_row(row)][select_row3_by_row(row)];
-	tmp_column = (struct dlx_column *)(tmp_cell->cx);
-	debug_print();
-	cover_col(tmp_column);
-
-	return;
+	for (right_cell = tmp_cell->rx; 
+		right_cell != tmp_cell; 
+		right_cell = right_cell->rx) {
+		tmp_column = (struct dlx_column *)(right_cell->cx);
+		cover_col(tmp_column);
+	}
 }
 
 void cover_col(struct dlx_column *col)
@@ -259,12 +262,11 @@ void cover_col(struct dlx_column *col)
 	struct dlx_node *row;
 	struct dlx_node *rightnode;
 
-	count++;
 	debug_print("id is %d", col->id);
 	debug_print("col->lx id is %d", ((struct dlx_column *)(col->lx))->id);
 	debug_print("col->lx id is %d", ((struct dlx_column *)(col->rx))->id);
-	((struct dlx_column *)(col->lx))->rx = col->rx;
 	((struct dlx_column *)(col->rx))->lx = col->lx;
+	((struct dlx_column *)(col->lx))->rx = col->rx;
 
 	for (row = (struct dlx_node *)(col->dx); 
 			row != (struct dlx_node *)col; 
@@ -284,6 +286,22 @@ void cover_col(struct dlx_column *col)
 
 void uncover_col(struct dlx_column *col)
 {
+	struct dlx_node *row;
+	struct dlx_node *leftnode;
+
+	for (row = (struct dlx_node *)(col->ux); 
+			row != (struct dlx_node *)col; 
+			row = (struct dlx_node *)(row->ux)) {
+		for (leftnode = row->lx; 
+			leftnode != row; 
+			leftnode = leftnode->rx) {
+			((struct dlx_node *)(leftnode->ux))->dx = leftnode;
+			((struct dlx_node *)(leftnode->dx))->ux = leftnode;
+			((struct dlx_column *)leftnode->cx)->s += 1;
+		}
+	}
+	((struct dlx_column *)(col->rx))->lx = col;
+	((struct dlx_column *)(col->lx))->rx = col;
 	return;
 }
 
@@ -305,7 +323,10 @@ void search(int n)
 	struct dlx_node *rightnode;
 	struct dlx_node *leftnode;
 
+	debug_print("aaasearch n is %d", n);
+	debug_print("RESULT_COUNT is %d", RESULT_COUNT);
 	if (h.rx == &h) {
+		FINISHED = 1;
 		debug_print();
 		print_solution();
 		return;
@@ -314,25 +335,20 @@ void search(int n)
 		debug_print("min_col->id is %d", min_col->id);
 		cover_col(min_col);
 
-		for (row = min_col->dx; row != (void *)min_col; row = row->dx) {
+		for (row = min_col->dx; 
+		     row != (void *)min_col && !FINISHED; 
+		     row = row->dx) {
 			add_solutions(row);
-
 			for (rightnode = row->rx; 
 				rightnode != row;
-				rightnode = rightnode->rx) {
-				debug_print();
+				rightnode = rightnode->rx)
 				cover_col(rightnode->cx);
-			}
-
 			search(n + 1);
-
-			remove_solutions(row);
-			// min_col = row->cx;
-
 			for (leftnode = row->lx;
 				leftnode != row;
 				leftnode = leftnode->lx)
 				uncover_col(leftnode->cx);
+			remove_solutions(row);
 		}
 		uncover_col(min_col);
 	}
@@ -341,41 +357,55 @@ void search(int n)
 
 void print_solution(void)
 {
+	int i;
+	int j;
+
+	debug_print("success");
+	for (i = 0; i < SUDOKU_RANK; i++)
+		for (j = 0; j < SUDOKU_RANK; j++)
+			if (!init_data[i][j])
+				init_data[i][j] = RESULT[i * SUDOKU_RANK + j] % SUDOKU_RANK + 1;
+
+	printf("output:\n");
+	print_soduku(init_data);
 	return;
 }
 
 /* struct dlx_column *choose_min_col(struct dlx_header *header) */
-struct dlx_column *choose_min_col(struct dlx_column *header)
+struct dlx_column *choose_min_col(struct dlx_column *ptrheader)
 {
 	struct dlx_column *min_col;
 	struct dlx_column *tmp_col;
 
-	if (header->rx == header)
+#if 0 /* bug: fixme */
+	if (ptrheader->rx == ptrheader)
 		return NULL;
-	min_col = (struct dlx_column *)(header->rx);
+	min_col = (struct dlx_column *)(ptrheader->rx);
 	for (tmp_col = min_col->rx;
-		tmp_col != (void *)header;
+		tmp_col != (void *)ptrheader;
 		tmp_col = tmp_col->rx) {
 		if (tmp_col->s < min_col->s)
 			min_col = tmp_col;
 	}
+#else
+	min_col = (struct dlx_column *)(ptrheader->rx);
+#endif
 	return min_col;
 }
 
 void add_solutions(struct dlx_node *row)
 {
-	return;
+	RESULT[RESULT_COUNT++] = row->row_id;
 }
 
 void remove_solutions(struct dlx_node *row)
 {
 	debug_print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-	return;
+	RESULT[--RESULT_COUNT] = 0;
 }
 
 int main(int argc, char **argv)
 {
-	int init_data[SUDOKU_RANK][SUDOKU_RANK] = {{0}};
 	char read_input[256] = {0};
 	char *this_name = argv[0];
 	char *thisarg;

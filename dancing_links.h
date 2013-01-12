@@ -10,6 +10,7 @@ struct dlx_node {
 	void *ux;
 	void *dx;
 	void *cx;
+	int row_id;
 };
 
 struct dlx_column {
