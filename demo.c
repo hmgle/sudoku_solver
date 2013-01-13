@@ -264,7 +264,7 @@ void cover_col(struct dlx_column *col)
 
 	debug_print("id is %d", col->id);
 	debug_print("col->lx id is %d", ((struct dlx_column *)(col->lx))->id);
-	debug_print("col->lx id is %d", ((struct dlx_column *)(col->rx))->id);
+	debug_print("col->rx id is %d", ((struct dlx_column *)(col->rx))->id);
 	((struct dlx_column *)(col->rx))->lx = col->lx;
 	((struct dlx_column *)(col->lx))->rx = col->rx;
 
@@ -359,12 +359,16 @@ void print_solution(void)
 {
 	int i;
 	int j;
+	int row_id;
 
 	debug_print("success");
 	for (i = 0; i < SUDOKU_RANK; i++)
-		for (j = 0; j < SUDOKU_RANK; j++)
-			if (!init_data[i][j])
-				init_data[i][j] = RESULT[i * SUDOKU_RANK + j] % SUDOKU_RANK + 1;
+		for (j = 0; j < SUDOKU_RANK; j++) {
+			row_id = RESULT[i * SUDOKU_RANK + j];
+			init_data[row_id / (SUDOKU_RANK * SUDOKU_RANK)]
+				[row_id / SUDOKU_RANK % SUDOKU_RANK] = 
+				RESULT[i * SUDOKU_RANK + j] % SUDOKU_RANK + 1;
+		}
 
 	printf("output:\n");
 	print_soduku(init_data);
@@ -377,7 +381,7 @@ struct dlx_column *choose_min_col(struct dlx_column *ptrheader)
 	struct dlx_column *min_col;
 	struct dlx_column *tmp_col;
 
-#if 0 /* bug: fixme */
+#if 1 /* bug: fixme */
 	if (ptrheader->rx == ptrheader)
 		return NULL;
 	min_col = (struct dlx_column *)(ptrheader->rx);
@@ -395,12 +399,14 @@ struct dlx_column *choose_min_col(struct dlx_column *ptrheader)
 
 void add_solutions(struct dlx_node *row)
 {
+	debug_print("add solutions %d", row->row_id);
 	RESULT[RESULT_COUNT++] = row->row_id;
 }
 
 void remove_solutions(struct dlx_node *row)
 {
 	debug_print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+	debug_print("del solutions %d", row->row_id);
 	RESULT[--RESULT_COUNT] = 0;
 }
 
