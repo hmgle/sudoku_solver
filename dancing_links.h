@@ -3,6 +3,12 @@
 
 #include <stdint.h>
 #include <string.h>
+#include <limits.h>
+
+#ifndef INT_MAX
+#define	INT_MAX		2147483647
+#endif
+#define HEADER_ID	INT_MAX
 
 struct dlx_node {
 	struct dlx_node *lx;
@@ -71,6 +77,8 @@ void free_str(char *str);
 struct dlx_matrix *h2matrix(struct dlx_matrix *matrix, const struct dlx_header *h);
 void free_dlx_h(struct dlx_header *h);
 
+void dlx_cover_col(struct dlx_column *col);
+void dlx_uncover_col(struct dlx_column *col);
 #endif
 
 /* vim: set ts=8 sw=8 tw=78 ai si: */

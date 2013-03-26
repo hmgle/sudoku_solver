@@ -10,6 +10,7 @@ int main(int argc, char **argv)
 	struct dlx_matrix test_matrix;
 	struct dlx_header h;
 	char *matrix_dsp = NULL;
+	struct solve_result result;
 
 	if (argc < 4)
 		return -1;
@@ -24,6 +25,8 @@ int main(int argc, char **argv)
 	h2str(&matrix_dsp, &h);
 
 	debug_print("matrix_dsp is %s", matrix_dsp);
+
+	dlx_search(&h, &result);
 
 	h2matrix(&test_matrix, &h);
 	print_dlx_matrix(&test_matrix);

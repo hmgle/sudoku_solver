@@ -85,6 +85,7 @@ struct dlx_header *matrix2h(struct dlx_header *h, const struct dlx_matrix *matri
 	h->lx = &col[matrix->col_num - 1];
 	h->pcell = cell;
 	h->pcol = col;
+	h->id = HEADER_ID;
 	col[0].lx = h;
 	col[matrix->col_num - 1].rx = h;
 	col[matrix->col_num - 1].dx = &col[matrix->col_num - 1];
@@ -141,7 +142,7 @@ char *h2str(char **str, const struct dlx_header *h)
 
 	*str = malloc(sizeof(char) * (h->col_num * h->row_num + 1));
 	memset(*str, '0', sizeof(char) * h->col_num * h->row_num);
-	*str[h->col_num * h->row_num + 1] = '\0';
+	(*str)[h->col_num * h->row_num + 1] = '\0';
 	assert(h);
 	for (col = h->rx; col != (void *)h; col = col->rx) {
 		for (node = col->dx; node != (void *)col; node = node->dx) {
@@ -192,6 +193,11 @@ struct dlx_column *min_s_col(const struct dlx_header *h)
 	struct dlx_column *min_col;
 	struct dlx_column *tmp_col;
 
+	struct dlx_matrix test_matrix;
+
+	h2matrix(&test_matrix, h);
+	print_dlx_matrix(&test_matrix);
+
 	if (h->rx == h)
 		return NULL;
 	min_col = h->rx;
@@ -201,15 +207,70 @@ struct dlx_column *min_s_col(const struct dlx_header *h)
 		if (tmp_col->s < min_col->s)
 			min_col = tmp_col;
 	}
+	debug_print("mid_col id is %d", min_col->id);
+	free_matrix(&test_matrix);
 	return min_col;
 }
 void show_solution(struct solve_result *resule)
 {
+	debug_print();
+}
+
+void dlx_cover_col(struct dlx_column *col)
+{
+	struct dlx_node *row;
+	struct dlx_node *rightnode;
+
+	debug_print();
+	((struct dlx_column *)(col->rx))->lx = col->lx;
+	debug_print();
+	((struct dlx_column *)(col->lx))->rx = col->rx;
+
+	for (row = (struct dlx_node *)(col->dx);
+			row != (struct dlx_node *)col;
+			row = (struct dlx_node *)(row->dx)) {
+		for (rightnode = row->rx;
+			rightnode != row;
+			rightnode = rightnode->rx) {
+			((struct dlx_node *)(rightnode->ux))->dx = 
+				rightnode->dx;
+			((struct dlx_node *)(rightnode->dx))->ux = 
+				rightnode->ux;
+			((struct dlx_column *)rightnode->cx)->s--;
+		}
+	}
+	return;
+}
+
+void dlx_uncover_col(struct dlx_column *col)
+{
+	struct dlx_node *row;
+	struct dlx_node *leftnode;
+
+	for (row = (struct dlx_node *)(col->ux); 
+			row != (struct dlx_node *)col; 
+			row = (struct dlx_node *)(row->ux)) {
+		for (leftnode = row->lx; 
+			leftnode != row; 
+			leftnode = leftnode->rx) {
+			((struct dlx_column *)leftnode->cx)->s++;
+			((struct dlx_node *)(leftnode->ux))->dx = leftnode;
+			((struct dlx_node *)(leftnode->dx))->ux = leftnode;
+		}
+	}
+	((struct dlx_column *)(col->rx))->lx = col;
+	((struct dlx_column *)(col->lx))->rx = col;
+	return;
 }
 
 void dlx_search(struct dlx_header *h, struct solve_result *result)
 {
 	struct dlx_column *min_col;
+	struct dlx_node *node;
+	struct dlx_node *rightnode;
+	struct dlx_node *leftnode;
+
+	struct dlx_matrix test_matrix;
 
 	if (h->rx == h) {
 		show_solution(result);
@@ -218,8 +279,35 @@ void dlx_search(struct dlx_header *h, struct solve_result *result)
 		min_col = min_s_col(h);
 		if (min_col->s == 0)
 			return;
-	}
-}
 
+		dlx_cover_col(min_col);
+
+		for (node = min_col->dx; node != (void *)min_col; node = node->dx) {
+			h2matrix(&test_matrix, h);
+			print_dlx_matrix(&test_matrix);
+			free_matrix(&test_matrix);
+			debug_print("node->cx id is %d", ((struct dlx_column *)(node->cx))->id);
+			for (rightnode = node->rx; 
+				rightnode != node;
+				rightnode = rightnode->rx) {
+				debug_print("rightnode->cx id is %d", ((struct dlx_column *)(rightnode->cx))->id);
+				dlx_cover_col(rightnode->cx);
+			}
+			h2matrix(&test_matrix, h);
+			print_dlx_matrix(&test_matrix);
+			free_matrix(&test_matrix);
+			dlx_search(h, result);
+			for (leftnode = node->lx;
+				leftnode != node;
+				leftnode = leftnode->lx) {
+				dlx_uncover_col(leftnode->cx);
+			}
+		}
+
+		dlx_uncover_col(min_col);
+	}
+
+	return;
+}
 
 /* vim: set ts=8 sw=8 tw=78 ai si: */
