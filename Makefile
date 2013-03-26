@@ -9,7 +9,7 @@ else
 endif
 
 TARGET = demo dancing_links.o
-TMPTARGET = test_fun
+TMPTARGET = test_fun test_print_dlx_matrix
 
 .PHONY: all clean
 
@@ -26,6 +26,8 @@ dancing_links.o: dancing_links.c dancing_links.h
 test_fun: test_fun.o
 
 test_fun.o: test_fun.c
+
+test_print_dlx_matrix: test_print_dlx_matrix.o dancing_links.o
 
 clean:
 	-rm -f *.o $(TARGET) $(TMPTARGET)
