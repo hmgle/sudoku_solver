@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#define DEBUG_PRINT         1
 #define debug_print(fmt, ...) \
     do { \
         if (DEBUG_PRINT) \
@@ -13,7 +12,6 @@
                     ##__VA_ARGS__); \
     } while (0)
 
-#define DEBUG_LOG 1
 #if DEBUG_LOG
 FILE *DEBUG_LOG_FILE;
 char DEBUG_STRING[1024];

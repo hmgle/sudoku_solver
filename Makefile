@@ -1,6 +1,13 @@
 CC = gcc
 CFLAGS = -Wall -O2 -g
 
+debug =
+ifeq ($(debug), 1)
+	CFLAGS += -Wextra -DDEBUG_PRINT=1 -DDEBUG_LOG=1
+else
+	CFLAGS += -DDEBUG_PRINT=0 -DDEBUG_LOG=0
+endif
+
 TARGET = demo dancing_links.o
 TMPTARGET = test_fun
 
