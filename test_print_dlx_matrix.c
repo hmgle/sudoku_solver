@@ -2,6 +2,13 @@
 #include "debug_print.h"
 #include <stdlib.h>
 
+static void show_usage(const char *pro_name);
+
+static void show_usage(const char *pro_name)
+{
+	fprintf(stderr, "Usage: %s row_num  col_num matrix_str\n", pro_name);
+}
+
 int main(int argc, char **argv)
 {
 	int row_num;
@@ -12,8 +19,10 @@ int main(int argc, char **argv)
 	char *matrix_dsp = NULL;
 	struct solve_result result;
 
-	if (argc < 4)
+	if (argc < 4) {
+		show_usage(argv[0]);
 		return -1;
+	}
 	row_num = atoi(argv[1]);
 	col_num = atoi(argv[2]);
 
