@@ -1,11 +1,11 @@
 CC = gcc
-CFLAGS = -Wall -O2 -g
+CFLAGS = -Wall
 
 debug =
 ifeq ($(debug), 1)
-	CFLAGS += -Wextra -DDEBUG_PRINT=1 -DDEBUG_LOG=1
+	CFLAGS += -Wextra -DDEBUG_PRINT=1 -DDEBUG_LOG=1 -g -O0
 else
-	CFLAGS += -DDEBUG_PRINT=0 -DDEBUG_LOG=0
+	CFLAGS += -DDEBUG_PRINT=0 -DDEBUG_LOG=0 -O2
 endif
 
 TARGET = demo dancing_links.o
