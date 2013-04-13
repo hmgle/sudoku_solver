@@ -141,8 +141,7 @@ char *h2str(char **str, const struct dlx_header *h)
 	struct dlx_node *node;
 
 	*str = malloc(sizeof(char) * (h->col_num * h->row_num + 1));
-	memset(*str, '0', sizeof(char) * h->col_num * h->row_num);
-	(*str)[h->col_num * h->row_num + 1] = '\0';
+	memset(*str, '0', sizeof(char) * (h->col_num * h->row_num + 1));
 	assert(h);
 	for (col = h->rx; col != (void *)h; col = col->rx) {
 		for (node = col->dx; node != (void *)col; node = node->dx) {
