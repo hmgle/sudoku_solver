@@ -69,6 +69,7 @@ void free_matrix(struct dlx_matrix *matrix)
 struct dlx_header *matrix2h(struct dlx_header *h, const struct dlx_matrix *matrix)
 {
 	struct dlx_column *col;
+	struct dlx_row *row;
 	struct dlx_node *cell;
 	int i, j;
 	struct dlx_node tmp_row;
@@ -76,6 +77,8 @@ struct dlx_header *matrix2h(struct dlx_header *h, const struct dlx_matrix *matri
 	memset(h, 0, sizeof(struct dlx_header));
 	col = malloc(sizeof(struct dlx_column) * matrix->col_num);
 	memset(col, 0, sizeof(struct dlx_column) * matrix->col_num);
+	row = malloc(sizeof(struct dlx_row) * matrix->row_num);
+	memset(row, 0, sizeof(struct dlx_row) * matrix->row_num);
 	cell = malloc(sizeof(struct dlx_node) * matrix->size);
 	memset(cell, 0, sizeof(struct dlx_node) * matrix->size);
 	h->row_num = matrix->row_num;

@@ -30,6 +30,13 @@ struct dlx_column {
 	int id;		/* N[y] */
 };
 
+struct dlx_row {
+	void *lx;
+	void *rx;
+	int s;
+	int id;
+};
+
 struct dlx_header {
 	void *lx;
 	void *rx;
@@ -40,6 +47,7 @@ struct dlx_header {
 	int id;
 	void *pcell;
 	void *pcol;
+	void *prow;
 	int col_num;
 	int row_num;
 	int size;
