@@ -23,14 +23,6 @@ test_print_dlx_matrix: test_print_dlx_matrix.o dancing_links.o
 
 test_fun: test_fun.o
 
-# demo.o: demo.c debug_print.h
-# 	$(CC) -c -o $@ $< $(CFLAGS)
-
-# dancing_links.o: dancing_links.c dancing_links.h
-# 	$(CC) -c -o $@ $< $(CFLAGS)
-
-# test_fun.o: test_fun.c
-
 sinclude $(SRC:.c=.d)
 
 %d: %c
@@ -38,7 +30,6 @@ sinclude $(SRC:.c=.d)
 		$(CC) -MM $(CPPFLAGS) $< > $@.$$$$; \
 		sed 's,\(.*\)\.o[:]*,\1.o $@:,' < $@.$$$$ > $@; \
 		rm -f $@.$$$$
-
 
 clean:
 	-rm -f *.o $(TARGET) $(TMPTARGET)
