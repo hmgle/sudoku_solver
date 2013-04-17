@@ -66,6 +66,17 @@ void free_matrix(struct dlx_matrix *matrix)
 	}
 }
 
+void haddvialocation(struct dlx_header *h, const struct location *loc)
+{
+	struct dlx_node *cell;
+
+	assert(h->row_num > loc->r && h->col_num > loc->c);
+	cell = malloc(sizeof(struct dlx_node));
+	memset(cell, 0, sizeof(struct dlx_node));
+	cell->row_id = loc->r;
+	cell->col_id = loc->c;
+}
+
 struct dlx_header *matrix2h(struct dlx_header *h, const struct dlx_matrix *matrix)
 {
 	struct dlx_column *col;
@@ -88,6 +99,7 @@ struct dlx_header *matrix2h(struct dlx_header *h, const struct dlx_matrix *matri
 	h->lx = &col[matrix->col_num - 1];
 	h->pcell = cell;
 	h->pcol = col;
+	h->prow = row;
 	h->id = HEADER_ID;
 	col[0].lx = h;
 	col[matrix->col_num - 1].rx = h;

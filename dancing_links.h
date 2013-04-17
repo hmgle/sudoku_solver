@@ -79,6 +79,7 @@ struct dlx_matrix *alloc_matrix_via_str(struct dlx_matrix *matrix, const char *s
 void free_matrix(struct dlx_matrix *matrix);
 int how_many_1_in_str(const char *str);
 void print_dlx_matrix(const struct dlx_matrix *matrix);
+void haddvialocation(struct dlx_header *h, const struct location *loc);
 struct dlx_header *matrix2h(struct dlx_header *h, const struct dlx_matrix *matrix);
 char *h2str(char **str, const struct dlx_header *h);
 void free_str(char *str);
