@@ -25,7 +25,7 @@ test_fun: test_fun.o
 
 sinclude $(SRC:.c=.d)
 
-%d: %c
+%.d: %.c
 	@set -e; rm -f $@; \
 		$(CC) -MM $(CPPFLAGS) $< > $@.$$$$; \
 		sed 's,\(.*\)\.o[:]*,\1.o $@:,' < $@.$$$$ > $@; \
