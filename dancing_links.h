@@ -16,6 +16,7 @@ struct dlx_node {
 	void *ux;
 	void *dx;
 	void *cx;
+	struct dlx_row *rowx;
 	int row_id;
 	int col_id;
 };

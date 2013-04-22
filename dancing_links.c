@@ -69,12 +69,37 @@ void free_matrix(struct dlx_matrix *matrix)
 void haddvialocation(struct dlx_header *h, const struct location *loc)
 {
 	struct dlx_node *cell;
+	struct dlx_row *prow;
+	struct dlx_column *pcol;
 
 	assert(h->row_num > loc->r && h->col_num > loc->c);
 	cell = malloc(sizeof(struct dlx_node));
 	memset(cell, 0, sizeof(struct dlx_node));
 	cell->row_id = loc->r;
 	cell->col_id = loc->c;
+	prow = &((struct dlx_row *)(h->prow))[loc->r];
+	cell->rowx = prow;
+	void *next;
+	for (next = prow->rx; next != prow; next = ((struct dlx_node *)next)->rx) {
+		if (((struct dlx_node *)next)->col_id > cell->col_id) {
+			cell->rx = next;
+			cell->lx = ((struct dlx_node *)next)->lx;
+			((struct dlx_node *)(((struct dlx_node *)next)->lx))->rx = cell;
+			prow->s += 1;
+			break;
+		}
+	}
+	pcol = &((struct dlx_column *)(h->pcol))[loc->c];
+	cell->cx = pcol;
+	for (next = pcol->dx; next != pcol; next = ((struct dlx_node *)next)->dx) {
+		if (((struct dlx_node *)next)->row_id > cell->col_id) {
+			cell->dx = next;
+			cell->ux = ((struct dlx_node *)next)->ux;
+			((struct dlx_node *)(((struct dlx_node *)next)->ux))->dx = cell;
+			pcol->s += 1;
+			break;
+		}
+	}
 }
 
 struct dlx_header *matrix2h(struct dlx_header *h, const struct dlx_matrix *matrix)
