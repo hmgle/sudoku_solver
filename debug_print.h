@@ -18,7 +18,12 @@ char DEBUG_STRING[1024];
 #else
 FILE *DEBUG_LOG_FILE;
 char *DEBUG_STRING;
+# ifndef NDEBUG
+#   define NDEBUG
+# endif
 #endif
+
+#include <assert.h>
 
 #define open_debug_log(filename) do { \
     if (DEBUG_LOG) { \
