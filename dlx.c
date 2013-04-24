@@ -48,8 +48,36 @@ void dlx_header_release(struct dlx_head *h)
 	free(h->c);
 }
 
+static void insert_up_node(struct dlx_node *new, struct dlx_node *node)
+{
+	assert(new != NULL && node != NULL);
+	new->ux = node->ux;
+	new->dx = node;
+	new->rx = new->lx = new;
+	new->colx = node->colx;
+	node->colx->s += 1;
+	node->ux->dx = new;
+	node->ux = new;
+}
+
 static int dlx_col_add_node(struct dlx_col *col, struct dlx_node *cell)
 {
+#if 1
+	struct dlx_node *p;
+
+	for (p = col->c.dx; p != &col->c; p = p->dx) {
+		if (p->row_id == cell->row_id) {
+			return -1;
+		}
+		if (p->row_id > cell->row_id) {
+			insert_up_node(cell, p);
+			return 0;
+		}
+	}
+	insert_up_node(cell, &col->c);
+	return 0;
+#else
+
 	struct dlx_node *p;
 
 	for (p = col->c.dx; p != &col->c; p = p->dx) {
@@ -77,6 +105,7 @@ static int dlx_col_add_node(struct dlx_col *col, struct dlx_node *cell)
 	col->s += 1;
 	cell->colx = col;
 	return 0;
+#endif
 }
 
 static int dlx_row_add_node(struct dlx_head *h, struct dlx_node *cell)
