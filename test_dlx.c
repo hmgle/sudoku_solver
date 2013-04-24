@@ -14,6 +14,8 @@ int main(int argc, char **argv)
 	int col_num;
 	struct dlx_matrix matrix;
 	struct dlx_head dlx_h;
+	int is_run = 1;
+	int n;
 
 	if (argc < 4) {
 		show_usage(argv[0]);
@@ -25,6 +27,9 @@ int main(int argc, char **argv)
 	memset(&dlx_h, 0, sizeof(struct dlx_head));
 	dlx_header_init(&dlx_h, col_num, row_num);
 	matrix_to_header(&dlx_h, &matrix);
+
+	n = dlx_search(&dlx_h, 0, &is_run);
+	debug_print("dlx_search return %d", n);
 
 	dlx_header_release(&dlx_h);
 	free_matrix(&matrix);
