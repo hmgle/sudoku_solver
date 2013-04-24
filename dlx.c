@@ -104,6 +104,12 @@ static int dlx_row_add_node(struct dlx_head *h, struct dlx_node *cell)
 						return 0;
 					}
 				}
+				curr = curr->lx;
+				cell->lx = curr;
+				cell->rx = curr->rx;
+				curr->rx->lx = cell;
+				curr->rx = cell;
+				return 0;
 			}
 		}
 	}
