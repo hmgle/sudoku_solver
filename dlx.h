@@ -49,5 +49,8 @@ struct dlx_matrix *alloc_matrix_via_str(struct dlx_matrix *matrix, const char *s
 void free_matrix(struct dlx_matrix *matrix);
 void matrix_to_header(struct dlx_head *h, const struct dlx_matrix *matrix);
 struct dlx_col *min_s_col(const struct dlx_head *h);
+void dlx_cover_col(struct dlx_col *col);
+void dlx_uncover_col(struct dlx_col *col);
+int dlx_search(struct dlx_head *h, int sel_row_num, int *is_run);
 
 #endif

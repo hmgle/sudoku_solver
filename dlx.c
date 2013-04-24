@@ -223,3 +223,67 @@ static void unstrike_node_ud(struct dlx_node *col)
 	col->ux->dx = col;
 	col->dx->ux = col;
 }
+
+void dlx_cover_col(struct dlx_col *col)
+{
+	struct dlx_node *m, *n;
+
+	strike_node_lr(&col->c);
+	for (m = col->c.dx; m != &col->c; m = m->dx) {
+		for (n = m->rx; n != m; n = n->rx) {
+			strike_node_ud(n);
+			n->colx->s -= 1;
+		}
+	}
+}
+
+void dlx_uncover_col(struct dlx_col *col)
+{
+	struct dlx_node *m, *n;
+
+	for (m = col->c.ux; m != &col->c; m = m->ux) {
+		for (n = m->lx; n != m; n = n->lx) {
+			unstrike_node_ud(n);
+			n->colx->s += 1;
+		}
+	}
+	unstrike_node_lr(&col->c);
+}
+
+int dlx_search(struct dlx_head *h, int sel_row_num, int *is_run)
+{
+	int n = 0;	/* 0: no solution */
+	struct dlx_col *min_col;
+	struct dlx_node *node;
+	struct dlx_node *m;
+
+	if (h->h.rx == &h->h) {
+		*is_run = 0;
+		return sel_row_num;
+	}
+	min_col = min_s_col(h);
+#if 0
+	if (min_col->s < 1) {
+		return 0;
+	}
+	debug_print("min_col s is %d, id is %d", min_col->s, min_col->id);
+#endif
+	dlx_cover_col(min_col);
+	for (node = min_col->c.dx; node != &min_col->c; node = node->dx) {
+		for (m = node->rx; m != node; m = m->rx) {
+			dlx_cover_col(m->colx);
+		}
+		n = dlx_search(h, sel_row_num + 1, is_run);
+		for (m = node->lx; m != node; m = m->lx) {
+			dlx_uncover_col(m->colx);
+		}
+		if (n > 0) {
+			debug_print("node->row_id is %d", node->row_id);
+		}
+		if (*is_run == 0) {
+			break;
+		}
+	}
+	dlx_uncover_col(min_col);
+	return n;
+}
