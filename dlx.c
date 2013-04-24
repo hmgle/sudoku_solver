@@ -184,3 +184,42 @@ void matrix_to_header(struct dlx_head *h, const struct dlx_matrix *matrix)
 		dlx_add_node_to_header(h, matrix->bitset + i);
 	}
 }
+
+struct dlx_col *min_s_col(const struct dlx_head *h)
+{
+	struct dlx_col *min_col;
+	struct dlx_node *n;
+
+	assert(h->h.rx != &h->h);
+	min_col = h->h.rx->colx;
+	for (n = h->h.rx->rx; n != &h->h; n = n->rx) {
+		if (n->colx->s < min_col->s) {
+			min_col = n->colx;
+		}
+	}
+	return min_col;
+}
+
+static void strike_node_lr(struct dlx_node *col)
+{
+	col->lx->rx = col->rx;
+	col->rx->lx = col->lx;
+}
+
+static void strike_node_ud(struct dlx_node *col)
+{
+	col->ux->dx = col->dx;
+	col->dx->ux = col->ux;
+}
+
+static void unstrike_node_lr(struct dlx_node *col)
+{
+	col->lx->rx = col;
+	col->rx->lx = col;
+}
+
+static void unstrike_node_ud(struct dlx_node *col)
+{
+	col->ux->dx = col;
+	col->dx->ux = col;
+}
