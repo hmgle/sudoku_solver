@@ -278,6 +278,25 @@ void dlx_uncover_col(struct dlx_col *col)
 	unstrike_node_lr(&col->c);
 }
 
+void dlx_select_row(struct dlx_node *node)
+{
+	struct dlx_node *t = node;
+
+	assert(node);
+	do {
+		dlx_cover_col(t->colx);
+	} while ((t = t->rx) != node);
+}
+
+void dlx_unselect_row(struct dlx_node *node)
+{
+	struct dlx_node *t = node;
+
+	do {
+		dlx_uncover_col(t->colx);
+	} while ((t = t->lx) != node);
+}
+
 int dlx_search(struct dlx_head *h, int *solution, int sel_row_num, int *is_run)
 {
 	int n = 0;	/* 0: no solution */

@@ -11,7 +11,7 @@ endif
 SRC := $(wildcard ./*.c)
 
 TARGET = demo dancing_links.o
-TMPTARGET = test_fun test_print_dlx_matrix test_dlx
+TMPTARGET = test_fun test_print_dlx_matrix test_dlx test_sudoku
 
 .PHONY: all clean
 
@@ -22,6 +22,8 @@ demo: demo.o dancing_links.o
 test_print_dlx_matrix: test_print_dlx_matrix.o dancing_links.o
 
 test_dlx: test_dlx.o dlx.o
+
+test_sudoku: test_sudoku.o dlx.o
 
 test_fun: test_fun.o
 
