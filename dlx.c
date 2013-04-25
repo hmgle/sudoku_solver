@@ -77,7 +77,6 @@ static int dlx_col_add_node(struct dlx_col *col, struct dlx_node *cell)
 	insert_up_node(cell, &col->c);
 	return 0;
 #else
-
 	struct dlx_node *p;
 
 	for (p = col->c.dx; p != &col->c; p = p->dx) {
@@ -96,14 +95,14 @@ static int dlx_col_add_node(struct dlx_col *col, struct dlx_node *cell)
 			return 0;
 		}
 	}
-	col->c.dx = cell;
-	col->c.ux = cell;
-	cell->ux = &col->c;
 	cell->dx = &col->c;
+	cell->ux = col->c.ux;
 	cell->rx = cell;
 	cell->lx = cell;
-	col->s += 1;
 	cell->colx = col;
+	col->c.ux->dx = cell;
+	col->c.ux = cell;
+	col->s += 1;
 	return 0;
 #endif
 }
