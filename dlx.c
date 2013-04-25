@@ -278,7 +278,7 @@ void dlx_uncover_col(struct dlx_col *col)
 	unstrike_node_lr(&col->c);
 }
 
-int dlx_search(struct dlx_head *h, int sel_row_num, int *is_run)
+int dlx_search(struct dlx_head *h, int *solution, int sel_row_num, int *is_run)
 {
 	int n = 0;	/* 0: no solution */
 	struct dlx_col *min_col;
@@ -301,12 +301,13 @@ int dlx_search(struct dlx_head *h, int sel_row_num, int *is_run)
 		for (m = node->rx; m != node; m = m->rx) {
 			dlx_cover_col(m->colx);
 		}
-		n = dlx_search(h, sel_row_num + 1, is_run);
+		n = dlx_search(h, solution, sel_row_num + 1, is_run);
 		for (m = node->lx; m != node; m = m->lx) {
 			dlx_uncover_col(m->colx);
 		}
 		if (n > 0) {
-			debug_print("node->row_id is %d", node->row_id);
+			// debug_print("node->row_id is %d", node->row_id);
+			solution[sel_row_num] = node->row_id;
 		}
 		if (*is_run == 0) {
 			break;
