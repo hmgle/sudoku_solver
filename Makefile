@@ -10,12 +10,13 @@ endif
 
 SRC := $(wildcard ./*.c)
 
-TARGET = demo dancing_links.o
-TMPTARGET = test_fun test_print_dlx_matrix test_dlx test_sudoku
+TARGET = test_sudoku
+TMPTARGET = test_fun test_print_dlx_matrix test_dlx  demo dancing_links.o
 
 .PHONY: all clean
 
-all: $(TARGET) $(TMPTARGET)
+# all: $(TARGET) $(TMPTARGET)
+all: $(TARGET)
 
 demo: demo.o dancing_links.o
 
