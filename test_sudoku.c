@@ -23,7 +23,6 @@ int main(void)
 
 	memset(sel_row, 0, sizeof(sel_row));
 	memset(&input, 0, sizeof(input));
-#if 1
 	for (i = 0; i < MAX_COLUMN * MAX_ROW; i++) {
 		input[i] = '0';
 	}
@@ -38,18 +37,6 @@ int main(void)
 		loc = i * MAX_COLUMN + select_col3_by_row(i);
 		input[loc] = '1';
 	}
-#else
-	srand((unsigned int)time(NULL));
-	int count = 0;
-	for (i = 0; i < MAX_COLUMN * MAX_ROW; i++) {
-		// input[i] = '1';
-		// input[i] = rand() % 2 + '0';
-		input[i] = rand() % 47 == 0 ? '1' : '0';
-		if (input[i] == '1')
-			count++;
-	}
-	debug_print("count is %d", count);
-#endif
 
 	col_num = MAX_COLUMN;
 	row_num = MAX_ROW;
@@ -68,13 +55,6 @@ int main(void)
 	set_dlx_h_sudoku(&dlx_h, &sudoku, sel_row);
 	print_sudoku(&sudoku);
 
-#if 0
-	sel_row[0] = find_row_node(&dlx_h, 1);
-	sel_row[1] = find_row_node(&dlx_h, 52);
-	dlx_select_row(sel_row[0]);
-	dlx_select_row(sel_row[1]);
-#endif
-
 	/* for test search */
 	n = dlx_search(&dlx_h, solution, 0, &is_run);
 	debug_print("dlx_search return %d", n);
@@ -82,20 +62,17 @@ int main(void)
 	if (n > 0) {
 		printf("dlx_search() return %d\n", n);
 		for (i = 0; i < (size_t)n; i++) {
-			// debug_print("------- %d ", solution[i]);
-			// printf("------- %d \n", solution[i]);
 			set_sudoku_cell_via_row(&sudoku, solution[i]);
 		}
 	}
 	print_sudoku(&sudoku);
 
-#if 1	/* for free */
+	/* for free */
 	for (i = 0; i < sizeof(sel_row) / sizeof(sel_row[0]); i++) {
 		if (sel_row[i]) {
 			dlx_unselect_row(sel_row[i]);
 		}
 	}
-#endif
 
 	free(sudoku.data);
 	dlx_header_release(&dlx_h);
