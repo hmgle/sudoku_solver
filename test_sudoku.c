@@ -5,24 +5,14 @@
 #include "dlx_sudoku.h"
 #include "debug_print.h"
 
-int main(void)
+static void init_sudoku_dlx_h(struct dlx_head *h)
 {
+	struct dlx_matrix matrix;
 	char input[MAX_COLUMN * MAX_ROW + 1];
 	size_t i;
-	int row_num;
-	int col_num;
-	struct dlx_matrix matrix;
-	struct dlx_head dlx_h;
-	int is_run = 1;
-	int n;
-	int *solution;
-	struct dlx_node *sel_row[MAX_ROW];
-	char read_input[256] = {0};
-	struct sudoku_dsr sudoku;
-	int ret;
 
-	memset(sel_row, 0, sizeof(sel_row));
 	memset(&input, 0, sizeof(input));
+	memset(&matrix, 0, sizeof(struct dlx_matrix));
 	for (i = 0; i < MAX_COLUMN * MAX_ROW; i++) {
 		input[i] = '0';
 	}
@@ -38,15 +28,34 @@ int main(void)
 		input[loc] = '1';
 	}
 
+	alloc_matrix_via_str(&matrix, input, MAX_COLUMN, MAX_ROW);
+	matrix_to_header(h, &matrix);
+	free_matrix(&matrix);
+}
+
+int main(void)
+{
+	size_t i;
+	int row_num;
+	int col_num;
+	struct dlx_head dlx_h;
+	int is_run = 1;
+	int n;
+	int *solution;
+	struct dlx_node *sel_row[MAX_ROW];
+	char read_input[256] = {0};
+	struct sudoku_dsr sudoku;
+	int ret;
+
+	memset(sel_row, 0, sizeof(sel_row));
+
 	col_num = MAX_COLUMN;
 	row_num = MAX_ROW;
 	solution = malloc(sizeof(int) * row_num);
 	memset(solution, 0, sizeof(int) * row_num);
-	memset(&matrix, 0, sizeof(struct dlx_matrix));
-	alloc_matrix_via_str(&matrix, input, col_num, row_num);
 	memset(&dlx_h, 0, sizeof(struct dlx_head));
 	dlx_header_init(&dlx_h, col_num, row_num);
-	matrix_to_header(&dlx_h, &matrix);
+	init_sudoku_dlx_h(&dlx_h);
 
 	sudoku.data = malloc(sizeof(*sudoku.data) * SUDOKU_RANK	* SUDOKU_RANK);
 	memset(sudoku.data, 0, sizeof(*sudoku.data) * SUDOKU_RANK * SUDOKU_RANK);
@@ -76,7 +85,6 @@ int main(void)
 
 	free(sudoku.data);
 	dlx_header_release(&dlx_h);
-	free_matrix(&matrix);
 	free(solution);
 	return 0;
 }
