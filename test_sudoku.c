@@ -9,7 +9,6 @@ int main(void)
 {
 	char input[MAX_COLUMN * MAX_ROW + 1];
 	size_t i;
-
 	int row_num;
 	int col_num;
 	struct dlx_matrix matrix;
@@ -18,6 +17,9 @@ int main(void)
 	int n;
 	int *solution;
 	struct dlx_node *sel_row[MAX_ROW];
+	char read_input[256] = {0};
+	struct sudoku_dsr sudoku;
+	int ret;
 
 	memset(sel_row, 0, sizeof(sel_row));
 	memset(&input, 0, sizeof(input));
@@ -59,10 +61,19 @@ int main(void)
 	dlx_header_init(&dlx_h, col_num, row_num);
 	matrix_to_header(&dlx_h, &matrix);
 
+	sudoku.data = malloc(sizeof(*sudoku.data) * SUDOKU_RANK	* SUDOKU_RANK);
+	memset(sudoku.data, 0, sizeof(*sudoku.data) * SUDOKU_RANK * SUDOKU_RANK);
+	ret = scanf("%255s", read_input);
+	str2sudoku(&sudoku, SUDOKU_RANK, SUDOKU_RANK, read_input, sizeof(read_input));
+	set_dlx_h_sudoku(&dlx_h, &sudoku, sel_row);
+	print_sudoku(&sudoku);
+
+#if 0
 	sel_row[0] = find_row_node(&dlx_h, 1);
-	sel_row[1] = find_row_node(&dlx_h, 2);
-	// dlx_select_row(sel_row[0]);
+	sel_row[1] = find_row_node(&dlx_h, 52);
+	dlx_select_row(sel_row[0]);
 	dlx_select_row(sel_row[1]);
+#endif
 
 	/* for test search */
 	n = dlx_search(&dlx_h, solution, 0, &is_run);
@@ -72,16 +83,21 @@ int main(void)
 		printf("dlx_search() return %d\n", n);
 		for (i = 0; i < (size_t)n; i++) {
 			// debug_print("------- %d ", solution[i]);
-			printf("------- %d \n", solution[i]);
+			// printf("------- %d \n", solution[i]);
+			set_sudoku_cell_via_row(&sudoku, solution[i]);
 		}
 	}
+	print_sudoku(&sudoku);
 
+#if 1	/* for free */
 	for (i = 0; i < sizeof(sel_row) / sizeof(sel_row[0]); i++) {
 		if (sel_row[i]) {
 			dlx_unselect_row(sel_row[i]);
 		}
 	}
+#endif
 
+	free(sudoku.data);
 	dlx_header_release(&dlx_h);
 	free_matrix(&matrix);
 	free(solution);
