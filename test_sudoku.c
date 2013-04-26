@@ -2,58 +2,8 @@
 #include <stdlib.h>
 #include <time.h>
 #include "dlx.h"
+#include "dlx_sudoku.h"
 #include "debug_print.h"
-
-#define MAX_COLUMN	324	/* 81 cells + (9 + 9 + 9) * 9 */
-#define MAX_ROW		729	/* 81 cells * 9  */
-#define SUDOKU_RANK	9
-
-static int select_col0_by_row(int row)
-{
-	return row / SUDOKU_RANK;
-}
-
-static int select_col1_by_row(int row)
-{
-	return SUDOKU_RANK * SUDOKU_RANK 
-		+ row / (SUDOKU_RANK * SUDOKU_RANK) * SUDOKU_RANK 
-		+ row % SUDOKU_RANK;
-}
-
-static int select_col2_by_row(int row)
-{
-	return SUDOKU_RANK * SUDOKU_RANK * 2 
-		+ row % (SUDOKU_RANK * SUDOKU_RANK);
-}
-
-static int select_col3_by_row(int row)
-{
-	return SUDOKU_RANK * SUDOKU_RANK * 3 
-		+ (row / (SUDOKU_RANK * SUDOKU_RANK * 3)) * SUDOKU_RANK * 3 
-		+ (row % (SUDOKU_RANK * SUDOKU_RANK * 3)) 
-		% (SUDOKU_RANK * SUDOKU_RANK) / (SUDOKU_RANK * 3)
-		* SUDOKU_RANK
-		+ row % SUDOKU_RANK;
-}
-
-static struct dlx_node *find_row_node(struct dlx_head *h, int row)
-{
-	struct dlx_node *node;
-	struct dlx_node *col;
-	int col_id;
-
-	col_id = select_col0_by_row(row);
-	for (col = h->h.rx; col != &h->h; col = col->rx) {
-		if (col->colx->id == col_id) {
-			for (node = col->dx; node != col; node = node->dx) {
-				if (node->row_id == row) {
-					return node;
-				}
-			}
-		}
-	}
-	return NULL;
-}
 
 int main(void)
 {
