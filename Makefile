@@ -10,7 +10,7 @@ endif
 
 SRC := $(wildcard ./*.c)
 
-TARGET = test_sudoku
+TARGET = test_sudoku sudoku2str
 TMPTARGET = test_fun test_print_dlx_matrix test_dlx  demo dancing_links.o
 
 .PHONY: all clean
