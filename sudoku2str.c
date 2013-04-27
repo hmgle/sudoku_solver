@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <unistd.h>
+#include "debug_print.h"
 
 static void show_usage(const char *pro_name)
 {
@@ -41,7 +42,7 @@ int main(int argc, char **argv)
 	char ch;
 	int n = 0;
 	while (n < 81 && (ch = fgetc(in)) != EOF) {
-		if (ch == '1' || ch == '0' ||
+		if ((ch >= '0' && ch <= '9') ||
 		    ch == '*' || ch == '.' ||
 		    ch == 'x' || ch == 'X') {
 			str[n++] = ch;
