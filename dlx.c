@@ -305,7 +305,7 @@ int dlx_search(struct dlx_head *h, int *solution, int sel_row_num, int *is_run)
 	struct dlx_node *m;
 
 	if (h->h.rx == &h->h) {
-		*is_run = 0;
+		*is_run -= 1;
 		return sel_row_num;
 	}
 	min_col = min_s_col(h);

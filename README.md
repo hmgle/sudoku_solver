@@ -1,5 +1,4 @@
-soduku_solver
-=============
+# soduku_solver
 
 solve soduku via DLX.
 
