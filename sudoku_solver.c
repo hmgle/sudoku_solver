@@ -44,6 +44,20 @@ static void init_sudoku_dlx_h(struct dlx_head *h)
 	free_matrix(&matrix);
 }
 
+static void read_sudoku(FILE *in, char *read_input)
+{
+	char ch;
+	int n = 0;
+
+	while (n < 81 && (ch = fgetc(in)) != EOF) {
+		if ((ch >= '0' && ch <= '9') ||
+		    ch == '*' || ch == '.' ||
+		    ch == 'x' || ch == 'X') {
+			read_input[n++] = ch;
+		}
+	}
+}
+
 int main(int argc, char **argv)
 {
 	size_t i;
@@ -59,7 +73,6 @@ int main(int argc, char **argv)
 	int opt;
 	int show_sudoku_flag = 0;
 	FILE *in = stdin;
-	int ret;
 
 	while ((opt = getopt(argc, argv, "mh?")) != -1) {
 		switch (opt) {
@@ -95,19 +108,7 @@ int main(int argc, char **argv)
 	sudoku.data = malloc(sizeof(*sudoku.data) * SUDOKU_RANK	* SUDOKU_RANK);
 	memset(sudoku.data, 0, sizeof(*sudoku.data) * SUDOKU_RANK * SUDOKU_RANK);
 
-	{
-		char ch;
-		int n = 0;
-		while (n < 81 && (ch = fgetc(in)) != EOF) {
-			if ((ch >= '0' && ch <= '9') ||
-			    ch == '*' || ch == '.' ||
-			    ch == 'x' || ch == 'X') {
-				read_input[n++] = ch;
-			}
-		}
-	}
-
-
+	read_sudoku(in, read_input);
 	str2sudoku(&sudoku, SUDOKU_RANK, SUDOKU_RANK, read_input, sizeof(read_input));
 	set_dlx_h_sudoku(&dlx_h, &sudoku, sel_row);
 	if (show_sudoku_flag) {
