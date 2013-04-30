@@ -2,11 +2,13 @@
 
 Solve soduku via DLX.
 
-## Build
+## Building
 
 	make
 
 ## Usage
+
+Usage: ./sudoku_sover [-m] [inputfile]
 
 Example:
 
