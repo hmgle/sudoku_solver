@@ -127,6 +127,18 @@ void set_dlx_h_sudoku(struct dlx_head *h, const struct sudoku_dsr *sudoku, struc
 	}
 }
 
+void print_sudoku_str(const struct sudoku_dsr *sudoku)
+{
+	int i, j;
+
+	for (i = 0; i < SUDOKU_RANK; i++) {
+		for (j = 0; j < SUDOKU_RANK; j++) {
+			printf("%d", *(sudoku->data + i * SUDOKU_RANK + j));
+		}
+	}
+	printf("\n");
+}
+
 void print_sudoku(const struct sudoku_dsr *sudoku)
 {
 	int i, j;

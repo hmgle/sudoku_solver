@@ -1,9 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
+#include <unistd.h>
+#include <errno.h>
 #include "dlx.h"
 #include "dlx_sudoku.h"
 #include "debug_print.h"
+
+static void show_usage(const char *pro_name)
+{
+	fprintf(stderr, "Usage: %s [Options] [inputfile]\n"
+			"\n"
+			"Options:\n"
+			"        -m show more info\n"
+			"        -h show this help\n"
+			"\n", pro_name);
+}
 
 static void init_sudoku_dlx_h(struct dlx_head *h)
 {
@@ -33,7 +44,7 @@ static void init_sudoku_dlx_h(struct dlx_head *h)
 	free_matrix(&matrix);
 }
 
-int main(void)
+int main(int argc, char **argv)
 {
 	size_t i;
 	int row_num;
@@ -45,7 +56,31 @@ int main(void)
 	struct dlx_node *sel_row[MAX_ROW];
 	char read_input[256] = {0};
 	struct sudoku_dsr sudoku;
+	int opt;
+	int show_sudoku_flag = 0;
+	FILE *in = stdin;
 	int ret;
+
+	while ((opt = getopt(argc, argv, "mh?")) != -1) {
+		switch (opt) {
+		case 'm':
+			show_sudoku_flag = 1;
+			break;
+		case 'h':
+		default:
+			show_usage(argv[0]);
+			exit(1);
+		}
+	}
+	if (argc > optind) {
+		in = fopen(argv[optind], "r");
+		if (!in) {
+			fprintf(stderr,
+				"Unable to open input file \"%s\": %s\n",
+				argv[optind], strerror(errno));
+			return 1;
+		}
+	}
 
 	memset(sel_row, 0, sizeof(sel_row));
 
@@ -59,22 +94,30 @@ int main(void)
 
 	sudoku.data = malloc(sizeof(*sudoku.data) * SUDOKU_RANK	* SUDOKU_RANK);
 	memset(sudoku.data, 0, sizeof(*sudoku.data) * SUDOKU_RANK * SUDOKU_RANK);
-	ret = scanf("%255s", read_input);
+	ret = fscanf(in, "%255s", read_input);
 	str2sudoku(&sudoku, SUDOKU_RANK, SUDOKU_RANK, read_input, sizeof(read_input));
 	set_dlx_h_sudoku(&dlx_h, &sudoku, sel_row);
-	print_sudoku(&sudoku);
+	if (show_sudoku_flag) {
+		printf("before solve:");
+		print_sudoku(&sudoku);
+	}
 
 	/* for test search */
 	n = dlx_search(&dlx_h, solution, 0, &is_run);
-	debug_print("dlx_search return %d", n);
+	if (show_sudoku_flag) {
+		debug_print("dlx_search return %d", n);
+	}
 	/* end for test search */
 	if (n > 0) {
-		printf("dlx_search() return %d\n", n);
 		for (i = 0; i < (size_t)n; i++) {
 			set_sudoku_cell_via_row(&sudoku, solution[i]);
 		}
 	}
-	print_sudoku(&sudoku);
+	if (show_sudoku_flag) {
+		print_sudoku(&sudoku);
+	} else {
+		print_sudoku_str(&sudoku);
+	}
 
 	/* for free */
 	for (i = 0; i < sizeof(sel_row) / sizeof(sel_row[0]); i++) {
@@ -83,6 +126,8 @@ int main(void)
 		}
 	}
 
+	if (in != stdin)
+		fclose(in);
 	free(sudoku.data);
 	dlx_header_release(&dlx_h);
 	free(solution);
