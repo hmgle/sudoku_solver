@@ -98,14 +98,14 @@ int main(int argc, char **argv)
 	str2sudoku(&sudoku, SUDOKU_RANK, SUDOKU_RANK, read_input, sizeof(read_input));
 	set_dlx_h_sudoku(&dlx_h, &sudoku, sel_row);
 	if (show_sudoku_flag) {
-		printf("before solve:");
+		printf("before solve:\n");
 		print_sudoku(&sudoku);
 	}
 
 	/* for test search */
 	n = dlx_search(&dlx_h, solution, 0, &is_run);
 	if (show_sudoku_flag) {
-		debug_print("dlx_search return %d", n);
+		printf("dlx_search return %d:\n", n);
 	}
 	/* end for test search */
 	if (n > 0) {
