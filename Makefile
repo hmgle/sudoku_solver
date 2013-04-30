@@ -10,13 +10,13 @@ endif
 
 SRC := $(wildcard ./*.c)
 
-TARGET = test_sudoku sudoku2str
+TARGET = sudoku_solver sudoku2str
 
 .PHONY: all clean
 
 all: $(TARGET)
 
-test_sudoku: test_sudoku.o dlx.o dlx_sudoku.o
+sudoku_solver: sudoku_solver.o dlx.o dlx_sudoku.o
 
 sinclude $(SRC:.c=.d)
 

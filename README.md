@@ -10,4 +10,4 @@ solve soduku via DLX.
 
 Example:
 
-	./sudoku_solver.sh < test1.txt
+	./sudoku_solver -m < test1.txt

@@ -94,7 +94,20 @@ int main(int argc, char **argv)
 
 	sudoku.data = malloc(sizeof(*sudoku.data) * SUDOKU_RANK	* SUDOKU_RANK);
 	memset(sudoku.data, 0, sizeof(*sudoku.data) * SUDOKU_RANK * SUDOKU_RANK);
-	ret = fscanf(in, "%255s", read_input);
+
+	{
+		char ch;
+		int n = 0;
+		while (n < 81 && (ch = fgetc(in)) != EOF) {
+			if ((ch >= '0' && ch <= '9') ||
+			    ch == '*' || ch == '.' ||
+			    ch == 'x' || ch == 'X') {
+				read_input[n++] = ch;
+			}
+		}
+	}
+
+
 	str2sudoku(&sudoku, SUDOKU_RANK, SUDOKU_RANK, read_input, sizeof(read_input));
 	set_dlx_h_sudoku(&dlx_h, &sudoku, sel_row);
 	if (show_sudoku_flag) {
