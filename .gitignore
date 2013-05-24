@@ -6,3 +6,5 @@ test_print_dlx_matrix
 test_dlx
 test_sudoku
 sudoku2str
+tags
+sudoku_solver

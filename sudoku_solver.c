@@ -61,8 +61,6 @@ static void read_sudoku(FILE *in, char *read_input)
 int main(int argc, char **argv)
 {
 	size_t i;
-	int row_num;
-	int col_num;
 	struct dlx_head dlx_h;
 	int is_run = 1;
 	int n;
@@ -97,12 +95,10 @@ int main(int argc, char **argv)
 
 	memset(sel_row, 0, sizeof(sel_row));
 
-	col_num = MAX_COLUMN;
-	row_num = MAX_ROW;
-	solution = malloc(sizeof(int) * row_num);
-	memset(solution, 0, sizeof(int) * row_num);
+	solution = malloc(sizeof(int) * MAX_ROW);
+	memset(solution, 0, sizeof(int) * MAX_ROW);
 	memset(&dlx_h, 0, sizeof(struct dlx_head));
-	dlx_header_init(&dlx_h, col_num, row_num);
+	dlx_header_init(&dlx_h, MAX_COLUMN, MAX_ROW);
 	init_sudoku_dlx_h(&dlx_h);
 
 	sudoku.data = malloc(sizeof(*sudoku.data) * SUDOKU_RANK	* SUDOKU_RANK);
@@ -112,7 +108,7 @@ int main(int argc, char **argv)
 	str2sudoku(&sudoku, SUDOKU_RANK, SUDOKU_RANK, read_input, sizeof(read_input));
 	set_dlx_h_sudoku(&dlx_h, &sudoku, sel_row);
 	if (show_sudoku_flag) {
-		printf("before solve:\n");
+		printf("input sudoku:\n");
 		print_sudoku(&sudoku);
 	}
 
