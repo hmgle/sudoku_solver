@@ -72,7 +72,7 @@ int main(int argc, char **argv)
 	int show_sudoku_flag = 0;
 	FILE *in = stdin;
 
-	while ((opt = getopt(argc, argv, "mh?")) != -1) {
+	while ((opt = getopt(argc, argv, "vh?")) != -1) {
 		switch (opt) {
 		case 'v':
 			show_sudoku_flag = 1;
