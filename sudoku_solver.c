@@ -11,7 +11,7 @@ static void show_usage(const char *pro_name)
 	fprintf(stderr, "Usage: %s [Options] [inputfile]\n"
 			"\n"
 			"Options:\n"
-			"        -m show more info\n"
+			"        -v show more info\n"
 			"        -h show this help\n"
 			"\n", pro_name);
 }
@@ -74,7 +74,7 @@ int main(int argc, char **argv)
 
 	while ((opt = getopt(argc, argv, "mh?")) != -1) {
 		switch (opt) {
-		case 'm':
+		case 'v':
 			show_sudoku_flag = 1;
 			break;
 		case 'h':
@@ -112,12 +112,10 @@ int main(int argc, char **argv)
 		print_sudoku(&sudoku);
 	}
 
-	/* for test search */
 	n = dlx_search(&dlx_h, solution, 0, &is_run);
 	if (show_sudoku_flag) {
 		printf("dlx_search return %d:\n", n);
 	}
-	/* end for test search */
 	if (n > 0) {
 		for (i = 0; i < (size_t)n; i++) {
 			set_sudoku_cell_via_row(&sudoku, solution[i]);
