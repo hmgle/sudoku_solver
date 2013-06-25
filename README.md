@@ -8,11 +8,11 @@ Solve soduku via DLX.
 
 ## Usage
 
-Usage: ./sudoku_sover [-m] [inputfile]
+Usage: ./sudoku_sover [-v] [inputfile]
 
 Example:
 
-	./sudoku_solver -m < hardest_sudoku.txt
+	./sudoku_solver -v < hardest_sudoku.txt
 
 It can accept one line description of the sudoku input like this:
 
