@@ -106,7 +106,11 @@ int main(int argc, char **argv)
 
 	read_sudoku(in, read_input);
 	str2sudoku(&sudoku, SUDOKU_RANK, SUDOKU_RANK, read_input, sizeof(read_input));
-	set_dlx_h_sudoku(&dlx_h, &sudoku, sel_row);
+	if (set_dlx_h_sudoku(&dlx_h, &sudoku, sel_row) < 0) {
+		/* invalid sudoku input */
+		fprintf(stderr, "Invalid sudoku, no solution!\n");
+		exit(1);
+	}
 	if (show_sudoku_flag) {
 		printf("input sudoku:\n");
 		print_sudoku(&sudoku);

@@ -30,7 +30,7 @@ int cell2row(int r, int c, int val);
 struct sudoku_cell *row2cell(int row, struct sudoku_cell *cell);
 void set_sudoku_cell(struct sudoku_dsr *sudoku, const struct sudoku_cell *cell);
 void set_sudoku_cell_via_row(struct sudoku_dsr *sudoku, int row);
-void set_dlx_h_sudoku(struct dlx_head *h, const struct sudoku_dsr *sudoku, struct dlx_node **save_node);
+int set_dlx_h_sudoku(struct dlx_head *h, const struct sudoku_dsr *sudoku, struct dlx_node **save_node);
 void print_sudoku_str(const struct sudoku_dsr *sudoku);
 void print_sudoku(const struct sudoku_dsr *sudoku);
 

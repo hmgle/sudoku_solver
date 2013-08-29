@@ -106,7 +106,7 @@ void set_sudoku_cell_via_row(struct sudoku_dsr *sudoku, int row)
 	set_sudoku_cell(sudoku, &cell);
 }
 
-void set_dlx_h_sudoku(struct dlx_head *h, const struct sudoku_dsr *sudoku, struct dlx_node **save_node)
+int set_dlx_h_sudoku(struct dlx_head *h, const struct sudoku_dsr *sudoku, struct dlx_node **save_node)
 {
 	int i, j;
 	int val;
@@ -120,11 +120,14 @@ void set_dlx_h_sudoku(struct dlx_head *h, const struct sudoku_dsr *sudoku, struc
 			if (val > 0) {
 				row = cell2row(i, j, val);
 				*(save_node + n) = find_row_node(h, row);
-				dlx_select_row(*(save_node + n));
+				if (dlx_select_row(*(save_node + n)) < 0) {
+					return -1;
+				}
 				n++;
 			}
 		}
 	}
+	return 0;
 }
 
 void print_sudoku_str(const struct sudoku_dsr *sudoku)

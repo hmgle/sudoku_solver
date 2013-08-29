@@ -278,14 +278,17 @@ void dlx_uncover_col(struct dlx_col *col)
 	unstrike_node_lr(&col->c);
 }
 
-void dlx_select_row(struct dlx_node *node)
+int dlx_select_row(struct dlx_node *node)
 {
 	struct dlx_node *t = node;
 
-	assert(node);
+	if (node == NULL) {
+		return -1;
+	}
 	do {
 		dlx_cover_col(t->colx);
 	} while ((t = t->rx) != node);
+	return 0;
 }
 
 void dlx_unselect_row(struct dlx_node *node)

@@ -51,7 +51,7 @@ void matrix_to_header(struct dlx_head *h, const struct dlx_matrix *matrix);
 struct dlx_col *min_s_col(const struct dlx_head *h);
 void dlx_cover_col(struct dlx_col *col);
 void dlx_uncover_col(struct dlx_col *col);
-void dlx_select_row(struct dlx_node *node);
+int dlx_select_row(struct dlx_node *node);
 void dlx_unselect_row(struct dlx_node *node);
 int dlx_search(struct dlx_head *h, int *solution, int sel_row_num, int *is_run);
 
