@@ -7,4 +7,5 @@ test_dlx
 test_sudoku
 sudoku2str
 tags
+*.out
 sudoku_solver
