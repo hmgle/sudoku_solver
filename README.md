@@ -4,7 +4,7 @@ Solve soduku via DLX.
 
 ## Building
 
-	make
+	$ make
 
 ## Usage
 
