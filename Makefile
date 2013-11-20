@@ -1,5 +1,7 @@
 CC = gcc
 CFLAGS = -Wall
+INSTALL = install -D
+INSTALL_PROGRAM = $(INSTALL)
 
 debug =
 ifeq ($(debug), 1)
@@ -17,6 +19,14 @@ TARGET = sudoku_solver sudoku2str
 all: $(TARGET)
 
 sudoku_solver: sudoku_solver.o dlx.o dlx_sudoku.o
+
+install: sudoku_solver sudoku2str
+	$(INSTALL_PROGRAM) sudoku_solver /usr/local/bin/sudoku_solver
+	$(INSTALL_PROGRAM) sudoku2str /usr/local/bin/sudoku2str
+
+uninstall:
+	rm /usr/local/bin/sudoku2str
+	rm /usr/local/bin/sudoku_solver
 
 sinclude $(SRC:.c=.d)
 
