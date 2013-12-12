@@ -62,7 +62,6 @@ static void insert_up_node(struct dlx_node *new, struct dlx_node *node)
 
 static int dlx_col_add_node(struct dlx_col *col, struct dlx_node *cell)
 {
-#if 1
 	struct dlx_node *p;
 
 	for (p = col->c.dx; p != &col->c; p = p->dx) {
@@ -76,35 +75,6 @@ static int dlx_col_add_node(struct dlx_col *col, struct dlx_node *cell)
 	}
 	insert_up_node(cell, &col->c);
 	return 0;
-#else
-	struct dlx_node *p;
-
-	for (p = col->c.dx; p != &col->c; p = p->dx) {
-		if (p->row_id == cell->row_id) {
-			return -1;
-		}
-		if (p->row_id > cell->row_id) {
-			p->ux->dx = cell;
-			cell->dx = p;
-			cell->ux = p->ux;
-			cell->rx = cell;
-			cell->lx = cell;
-			p->ux = cell;
-			cell->colx = col;
-			col->s += 1;
-			return 0;
-		}
-	}
-	cell->dx = &col->c;
-	cell->ux = col->c.ux;
-	cell->rx = cell;
-	cell->lx = cell;
-	cell->colx = col;
-	col->c.ux->dx = cell;
-	col->c.ux = cell;
-	col->s += 1;
-	return 0;
-#endif
 }
 
 static int dlx_row_add_node(struct dlx_head *h, struct dlx_node *cell)
@@ -328,7 +298,6 @@ int dlx_search(struct dlx_head *h, int *solution, int sel_row_num, int *is_run)
 			dlx_uncover_col(m->colx);
 		}
 		if (n > 0) {
-			// debug_print("node->row_id is %d", node->row_id);
 			solution[sel_row_num] = node->row_id;
 		}
 		if (*is_run == 0) {
