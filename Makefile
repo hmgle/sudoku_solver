@@ -20,6 +20,9 @@ all: $(TARGET)
 
 sudoku_solver: sudoku_solver.o dlx.o dlx_sudoku.o
 
+test:: $(TARGET)
+	./sudoku_solver -v hardest_sudoku.txt
+
 install: sudoku_solver sudoku2str
 	$(INSTALL_PROGRAM) sudoku_solver /usr/local/bin/sudoku_solver
 	$(INSTALL_PROGRAM) sudoku2str /usr/local/bin/sudoku2str
@@ -37,4 +40,4 @@ sinclude $(SRC:.c=.d)
 		rm -f $@.$$$$
 
 clean:
-	-rm -f *.o $(TARGET)
+	-rm -f *.o *.d $(TARGET)
