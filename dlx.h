@@ -45,7 +45,8 @@ struct dlx_matrix {
 void dlx_header_init(struct dlx_head *h, int col_num, int row_num);
 void dlx_header_release(struct dlx_head *h);
 void dlx_add_node_to_header(struct dlx_head *h, const struct location *loc);
-struct dlx_matrix *alloc_matrix_via_str(struct dlx_matrix *matrix, const char *str, int col_num, int row_num);
+struct dlx_matrix *alloc_matrix_via_str(struct dlx_matrix *matrix,
+				const char *str, int col_num, int row_num);
 void free_matrix(struct dlx_matrix *matrix);
 void matrix_to_header(struct dlx_head *h, const struct dlx_matrix *matrix);
 struct dlx_col *min_s_col(const struct dlx_head *h);

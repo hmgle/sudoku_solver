@@ -105,7 +105,8 @@ int main(int argc, char **argv)
 	memset(sudoku.data, 0, sizeof(*sudoku.data) * SUDOKU_RANK * SUDOKU_RANK);
 
 	read_sudoku(in, read_input);
-	str2sudoku(&sudoku, SUDOKU_RANK, SUDOKU_RANK, read_input, sizeof(read_input));
+	str2sudoku(&sudoku, SUDOKU_RANK, SUDOKU_RANK,
+			read_input, sizeof(read_input));
 	if (set_dlx_h_sudoku(&dlx_h, &sudoku, sel_row) < 0) {
 		/* invalid sudoku input */
 		fprintf(stderr, "Invalid sudoku, no solution!\n");

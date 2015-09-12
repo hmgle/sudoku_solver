@@ -147,7 +147,8 @@ static int how_many_1_in_str(const char *str)
 	return ret;
 }
 
-struct dlx_matrix *alloc_matrix_via_str(struct dlx_matrix *matrix, const char *str, int col_num, int row_num)
+struct dlx_matrix *alloc_matrix_via_str(struct dlx_matrix *matrix,
+				const char *str, int col_num, int row_num)
 {
 	int i;
 	int len = strlen(str);

@@ -7,22 +7,22 @@ int select_col0_by_row(int row)
 
 int select_col1_by_row(int row)
 {
-	return SUDOKU_RANK * SUDOKU_RANK 
-		+ row / (SUDOKU_RANK * SUDOKU_RANK) * SUDOKU_RANK 
+	return SUDOKU_RANK * SUDOKU_RANK
+		+ row / (SUDOKU_RANK * SUDOKU_RANK) * SUDOKU_RANK
 		+ row % SUDOKU_RANK;
 }
 
 int select_col2_by_row(int row)
 {
-	return SUDOKU_RANK * SUDOKU_RANK * 2 
+	return SUDOKU_RANK * SUDOKU_RANK * 2
 		+ row % (SUDOKU_RANK * SUDOKU_RANK);
 }
 
 int select_col3_by_row(int row)
 {
-	return SUDOKU_RANK * SUDOKU_RANK * 3 
-		+ (row / (SUDOKU_RANK * SUDOKU_RANK * 3)) * SUDOKU_RANK * 3 
-		+ (row % (SUDOKU_RANK * SUDOKU_RANK * 3)) 
+	return SUDOKU_RANK * SUDOKU_RANK * 3
+		+ (row / (SUDOKU_RANK * SUDOKU_RANK * 3)) * SUDOKU_RANK * 3
+		+ (row % (SUDOKU_RANK * SUDOKU_RANK * 3))
 		% (SUDOKU_RANK * SUDOKU_RANK) / (SUDOKU_RANK * 3)
 		* SUDOKU_RANK
 		+ row % SUDOKU_RANK;
@@ -47,8 +47,8 @@ struct dlx_node *find_row_node(struct dlx_head *h, int row)
 	return NULL;
 }
 
-struct sudoku_dsr *
-str2sudoku(struct sudoku_dsr *sudoku, int w, int h, char *str, size_t str_lenth)
+struct sudoku_dsr * str2sudoku(struct sudoku_dsr *sudoku, int w, int h,
+				char *str, size_t str_lenth)
 {
 	size_t i;
 	int n = 0;
@@ -59,7 +59,7 @@ str2sudoku(struct sudoku_dsr *sudoku, int w, int h, char *str, size_t str_lenth)
 	for (i = 0; i < str_lenth; i++) {
 		if (str[i] >= '1' && str[i] <= '9') {
 			*(sudoku->data + n) = str[i] - '0';
-		} else if (str[i] != '*' 
+		} else if (str[i] != '*'
 			   && str[i] != '.'
 			   && str[i] != '0'
 			   && str[i] != 'x'
@@ -106,7 +106,8 @@ void set_sudoku_cell_via_row(struct sudoku_dsr *sudoku, int row)
 	set_sudoku_cell(sudoku, &cell);
 }
 
-int set_dlx_h_sudoku(struct dlx_head *h, const struct sudoku_dsr *sudoku, struct dlx_node **save_node)
+int set_dlx_h_sudoku(struct dlx_head *h, const struct sudoku_dsr *sudoku,
+			struct dlx_node **save_node)
 {
 	int i, j;
 	int val;
