@@ -9,7 +9,7 @@ void dlx_header_init(struct dlx_head *h, int col_num, int row_num)
 	h->row_num = row_num;
 	h->size_node = 0;
 	h->c = malloc(sizeof(struct dlx_col) * col_num);
-	memset(h->c, 0, sizeof(sizeof(struct dlx_col) * col_num));
+	memset(h->c, 0, sizeof(struct dlx_col) * col_num);
 	memset(&h->h, 0, sizeof(struct dlx_node));
 
 	h->h.rx = &h->c[0].c;
